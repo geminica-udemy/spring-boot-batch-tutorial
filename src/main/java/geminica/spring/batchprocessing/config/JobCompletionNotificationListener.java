@@ -1,6 +1,5 @@
 package geminica.spring.batchprocessing.config;
 
-import geminica.spring.batchprocessing.model.Person;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +16,21 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
       LoggerFactory.getLogger(JobCompletionNotificationListener.class);
 
   private final JdbcTemplate jdbcTemplate;
+  private long startTime;
+
+  @Override
+  public void beforeJob(JobExecution jobExecution) {
+    startTime = System.currentTimeMillis();
+  }
 
   @Override
   public void afterJob(JobExecution jobExecution) {
     if (BatchStatus.COMPLETED == jobExecution.getStatus()) {
-      jdbcTemplate
-          .query(
-              "SELECT first_name, last_name FROM people",
-              (rs, row) -> new Person(rs.getString(1), rs.getString(2)))
-          .forEach(p -> log.info("Found {} in the database", p));
+      long endTime = System.currentTimeMillis();
+      log.info(
+          "Found {} records in the database. Import done in {} ms",
+          jdbcTemplate.queryForObject("SELECT count(*) FROM people", Long.class),
+          endTime - startTime);
     }
   }
 }
