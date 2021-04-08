@@ -3,6 +3,7 @@ package geminica.spring.batchprocessing.config;
 import geminica.spring.batchprocessing.jobs.PersonItemProcessor;
 import geminica.spring.batchprocessing.model.Person;
 import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -21,15 +22,10 @@ import org.springframework.core.io.ClassPathResource;
 
 @Configuration
 @EnableBatchProcessing
+@RequiredArgsConstructor
 public class BatchConfiguration {
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
-
-  public BatchConfiguration(
-      JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
-    this.jobBuilderFactory = jobBuilderFactory;
-    this.stepBuilderFactory = stepBuilderFactory;
-  }
 
   @Bean
   public Step step1(JdbcBatchItemWriter<Person> writer) {
